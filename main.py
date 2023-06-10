@@ -8,7 +8,7 @@ from pynput.keyboard import Key, Controller
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
-cap = cv2.VideoCapture(0) #Selecionar a WebCam
+cap = cv2.VideoCapture(2) #Selecionar a WebCam
 kb = Controller()
 
 
@@ -32,7 +32,7 @@ with mp_hands.Hands(min_detection_confidence=0.5,
 
         #Imagem horizontalmente para uma exibição posterior de visualização de selfie
         image = cv2.flip(image, 1)
-        image = cv2.resize(image, None, fx=2, fy=2) #Tamanho da tela: dobro do default
+        image = cv2.resize(image, None, fx=0.5, fy=0.5) #Tamanho da tela: dobro do default
         image_height, image_width, _ = image.shape
    
         # Converte BGR imagem para RGB após processamento
@@ -70,7 +70,8 @@ with mp_hands.Hands(min_detection_confidence=0.5,
                                2, cv2.LINE_AA)
 
 
-                # Se a mão for a direita e o polegar estiver acima dos outros dedos, é um gesto positivo
+                # Se a mão for a direita e o polegar estiver acima dos outros dedos, 
+                # é um gesto positivo
                 if (handness == 'Right' and 
                     thumb_tip.y < index_finger_tip.y and
                     thumb_tip.y < middle_finger_tip.y and
@@ -100,7 +101,8 @@ with mp_hands.Hands(min_detection_confidence=0.5,
                         print('Abra a Palma')
 
                 else:
-                    # Se o gesto "positivo" não está mais sendo detectado, resete a variável de controle e o tempo de início
+                    # Se o gesto "positivo" não está mais sendo detectado, 
+                    # resete a variável de controle e o tempo de início
                     positivo_detectado_direita = False
                     start_time_direita = None
 
@@ -121,6 +123,7 @@ with mp_hands.Hands(min_detection_confidence=0.5,
                         print('Começou o tempo')
                         kb.press(Key.left)
                         kb.release(Key.left)
+
                     title = "Esquerda - Voltar"
                     positivo_detectado_esquerda = True
                     print('.')
@@ -152,12 +155,15 @@ with mp_hands.Hands(min_detection_confidence=0.5,
                 landmarks = np.array(landmarks)
                 x_min, y_min = np.min(landmarks, axis=0)
                 x_max, y_max = np.max(landmarks, axis=0)
-                cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 255, 0), 2)
+                cv2.rectangle(image, (x_min, y_min), (x_max, y_max), 
+                              (0, 255, 0), 2)
 
                 cv2.putText(image, title, (x_min, y_min-10), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, 
+                            (0, 255, 0), 2)
 
-                mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                mp_drawing.draw_landmarks(image, hand_landmarks, 
+                                          mp_hands.HAND_CONNECTIONS)
 
         cv2.imshow('MediaPipe Hands', image)
 
