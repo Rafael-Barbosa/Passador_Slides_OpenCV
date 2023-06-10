@@ -4,15 +4,15 @@
 
 ### Este projeto utiliza a biblioteca OpenCV, juntamente com MediaPipe e Pynput, para criar um passador de slides controlado por gestos. Usamos a detecção de mãos do MediaPipe para identificar a posição dos dedos e os gestos, e o Pynput para controlar as ações do teclado.
 
-#### > Mão direita gesto 'Positivo' - passa slide (sempre bom deixar a palma da mão para o mediapipe reconheça os dedos)
+> Mão direita gesto 'Positivo' - passa slide (sempre bom deixar a palma da mão para o mediapipe reconheça os dedos)
 
-#### > Mão esquerda gesto 'Negativo' - volta slide 
+> Mão esquerda gesto 'Negativo' - volta slide 
 
 
 ![Fig.gif](img/Usuabilidade.gif)
 
 
-#### > Apenas uma mão pode dar os comandos
+>Apenas uma mão pode dar os comandos
 
 ![Fig.gif](img/Teste.gif)
 
