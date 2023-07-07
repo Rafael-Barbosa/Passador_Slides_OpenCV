@@ -3,12 +3,20 @@ import mediapipe as mp
 import numpy as np
 import time
 from pynput.keyboard import Key, Controller
+import tkinter as tk
 
 # Inicializando o módulo de desenho e mãos do MediaPipe
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
-cap = cv2.VideoCapture(2) #Selecionar a WebCam
+#Obtendo a resolução da Tela (se quiser a tela inteira)
+#root = tk.Tk()
+#screen_width = root.winfo_screenwidth()
+#screen_height = root.winfo_screenheight()
+
+
+
+cap = cv2.VideoCapture(0) #Selecionar a WebCam
 kb = Controller()
 
 
@@ -32,7 +40,8 @@ with mp_hands.Hands(min_detection_confidence=0.5,
 
         #Imagem horizontalmente para uma exibição posterior de visualização de selfie
         image = cv2.flip(image, 1)
-        image = cv2.resize(image, None, fx=0.5, fy=0.5) #Tamanho da tela: dobro do default
+        #image = cv2.resize(image, (screen_width, screen_height)) #Resolução da Tela
+        image = cv2.resize(image, None, fx=2, fy=2) #Tamanho da tela: dobro do default
         image_height, image_width, _ = image.shape
    
         # Converte BGR imagem para RGB após processamento
