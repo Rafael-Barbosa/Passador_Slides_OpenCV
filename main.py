@@ -8,6 +8,10 @@ import tkinter as tk
 # Inicializando o módulo de desenho e mãos do MediaPipe
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+mp_face_detection = mp.solutions.face_detection
+# Inicialize o detector de rosto
+face_detector = mp_face_detection.FaceDetection(min_detection_confidence=0.1)
+
 
 #Obtendo a resolução da Tela (se quiser a tela inteira)
 #root = tk.Tk()
@@ -29,8 +33,8 @@ start_time_direita = None
 start_time_esquerda = None
 
 
-with mp_hands.Hands(min_detection_confidence=0.5, 
-                    min_tracking_confidence=0.5) as hands:
+with mp_hands.Hands(min_detection_confidence=0.7, 
+                    min_tracking_confidence=0.7) as hands:
     
     while cap.isOpened():
         success, image = cap.read()
@@ -49,6 +53,29 @@ with mp_hands.Hands(min_detection_confidence=0.5,
 
         # Desenha os pontos nas mãos
         image.flags.writeable = True
+
+
+        face_results = face_detector.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        num_faces = 0
+
+        if face_results.detections:
+            num_faces = len(face_results.detections)
+            #print("Rosto detectado!")
+
+            for detection in face_results.detections:
+                bboxC = detection.location_data.relative_bounding_box
+                ih, iw, _ = image.shape
+                x, y, w, h = int(bboxC.xmin * iw), int(bboxC.ymin * ih), int(bboxC.width * iw), int(bboxC.height * ih)
+                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        if num_faces > 1:
+            cv2.putText(image, 'Certifique-se de que apenas um rosto esteja na camera.', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            cv2.imshow('MediaPipe Hands', image)
+
+            if cv2.waitKey(5) & 0xFF == 27:
+                break
+            continue
+
         if results.multi_hand_landmarks:
 
            
