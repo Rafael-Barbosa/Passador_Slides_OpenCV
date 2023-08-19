@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import time
+import pygame
 from pynput.keyboard import Key, Controller
 import tkinter as tk
 
@@ -9,9 +10,13 @@ import tkinter as tk
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 mp_face_detection = mp.solutions.face_detection
+
 # Inicialize o detector de rosto
 face_detector = mp_face_detection.FaceDetection(min_detection_confidence=0.1)
 
+#Boas Vindas
+pygame.mixer.init()
+sound = pygame.mixer.Sound('tutorial/sistemas.mp3')
 
 #Obtendo a resolução da Tela (se quiser a tela inteira)
 #root = tk.Tk()
@@ -32,6 +37,9 @@ positivo_detectado_esquerda = False
 start_time_direita = None
 start_time_esquerda = None
 
+cooldown_frames = 30  # Definir quantos quadros esperar antes de permitir que o som seja tocado novamente
+cooldown_counter = 0  # Contador de quadros desde a última vez que o som foi tocado
+sound_played = False  # Adicionado para garantir que o som seja tocado apenas uma vez
 
 with mp_hands.Hands(min_detection_confidence=0.7, 
                     min_tracking_confidence=0.7) as hands:
@@ -76,14 +84,43 @@ with mp_hands.Hands(min_detection_confidence=0.7,
                 break
             continue
 
+
         if results.multi_hand_landmarks:
 
            
 
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
 
-               
-                # Identificando qual mão foi detectada
+
+                # Detectando o gesto de "vitória" para o tutorial
+                index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+                middle_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
+                ring_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP]
+                pinky_tip = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_TIP]
+                
+                index_finger_base = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_PIP]
+                middle_finger_base = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_PIP]
+                ring_finger_base = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP]
+                pinky_base = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP]
+                
+                if (index_finger_tip.y < index_finger_base.y and 
+                    middle_finger_tip.y < middle_finger_base.y and 
+                    ring_finger_tip.y > ring_finger_base.y and 
+                    pinky_tip.y > pinky_base.y and 
+                    not sound_played and 
+                    cooldown_counter == 0 and not pygame.mixer.get_busy()):
+                    
+                    sound.play()
+                    sound_played = True  # Marque como verdadeiro após tocar o som
+                    cooldown_counter = cooldown_frames #contagem frames
+                
+                elif cooldown_counter > 0:
+                        cooldown_counter -= 1 #Decrementar o contador de cooldown
+                   
+                else: 
+                    sound_played = False
+                        
+                 # Identificando qual mão foi detectada
                 handness = results.multi_handedness[idx].classification[0].label
 
                 # Adicionando o título ao retângulo

@@ -57,6 +57,13 @@ image = cv2.resize(image, None, fx=2, fy=2) #Tamanho da tela: dobro do default
 ```python
 cv2.waitKey(5) & 0xFF == 27: #Tecla ESC
 ```
+# Added Features:
+
+* ##### Reconhecimento Facial: Só uma pessoa pode interagir.
+
+* ##### Inserção de um pequeno tutorial, quando feito o gesto de "vitória".
+
+
 
 # Limitações e Melhorias Futuras
 
