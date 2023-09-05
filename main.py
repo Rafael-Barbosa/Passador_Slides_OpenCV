@@ -16,7 +16,9 @@ face_detector = mp_face_detection.FaceDetection(min_detection_confidence=0.1)
 
 #Boas Vindas
 pygame.mixer.init()
-sound = pygame.mixer.Sound('tutorial/sistemas.mp3')
+tutorial = pygame.mixer.Sound('tutorial/sistemas_tutorial.mp3')
+resposta = pygame.mixer.Sound('tutorial/sistemas_resposta.mp3')
+
 
 #Obtendo a resolução da Tela (se quiser a tela inteira)
 #root = tk.Tk()
@@ -39,7 +41,10 @@ start_time_esquerda = None
 
 cooldown_frames = 30  # Definir quantos quadros esperar antes de permitir que o som seja tocado novamente
 cooldown_counter = 0  # Contador de quadros desde a última vez que o som foi tocado
-sound_played = False  # Adicionado para garantir que o som seja tocado apenas uma vez
+cooldown_frames_resposta = 30  # Definir quantos quadros esperar antes de permitir que o som seja tocado novamente
+cooldown_counter_resposta = 0  # Contador de quadros desde a última vez que o som foi tocado
+tutorial_played = False  # Adicionado para garantir que o som seja tocado apenas uma vez
+resposta_played = False  # Adicionado para garantir que o som seja tocado apenas uma vez
 
 with mp_hands.Hands(min_detection_confidence=0.7, 
                     min_tracking_confidence=0.7) as hands:
@@ -92,7 +97,7 @@ with mp_hands.Hands(min_detection_confidence=0.7,
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
 
 
-                # Detectando o gesto de "vitória" para o tutorial
+               
                 index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                 middle_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
                 ring_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_TIP]
@@ -103,22 +108,43 @@ with mp_hands.Hands(min_detection_confidence=0.7,
                 ring_finger_base = hand_landmarks.landmark[mp_hands.HandLandmark.RING_FINGER_PIP]
                 pinky_base = hand_landmarks.landmark[mp_hands.HandLandmark.PINKY_PIP]
                 
+                 # Detectando o gesto de "vitória" para o tutorial
                 if (index_finger_tip.y < index_finger_base.y and 
                     middle_finger_tip.y < middle_finger_base.y and 
                     ring_finger_tip.y > ring_finger_base.y and 
                     pinky_tip.y > pinky_base.y and 
-                    not sound_played and 
+                    not tutorial_played and 
                     cooldown_counter == 0 and not pygame.mixer.get_busy()):
                     
-                    sound.play()
-                    sound_played = True  # Marque como verdadeiro após tocar o som
+                    tutorial.play()
+                    tutorial_played = True  # Marque como verdadeiro após tocar o som
                     cooldown_counter = cooldown_frames #contagem frames
                 
                 elif cooldown_counter > 0:
                         cooldown_counter -= 1 #Decrementar o contador de cooldown
                    
                 else: 
-                    sound_played = False
+                    tutorial_played = False
+
+                
+                # Detectando o gesto de "dedo do meio"
+    
+                if (index_finger_tip.y > index_finger_base.y and 
+                    middle_finger_tip.y < middle_finger_base.y and 
+                    ring_finger_tip.y > ring_finger_base.y and 
+                    pinky_tip.y > pinky_base.y and 
+                    not resposta_played and 
+                    cooldown_counter_resposta == 0 and 
+                    not pygame.mixer.get_busy()):
+                    
+                    resposta.play()
+                    resposta_played = True  # Marque como verdadeiro após tocar o som
+                    cooldown_counter_resposta = cooldown_frames_resposta # Inicie a contagem de frames para cooldown
+                    
+                else:
+                    if cooldown_counter_resposta > 0:
+                        cooldown_counter_resposta -= 1 # Decrementar o contador de cooldown
+                    resposta_played = False  # Resetar para o estado inicial
                         
                  # Identificando qual mão foi detectada
                 handness = results.multi_handedness[idx].classification[0].label
@@ -181,7 +207,7 @@ with mp_hands.Hands(min_detection_confidence=0.7,
 
                
 
-               
+               #Sinal Mão esquerda
                 if (handness == 'Left' and 
                     thumb_tip.y < index_finger_tip.y and 
                     thumb_tip.y < middle_finger_tip.y and 
